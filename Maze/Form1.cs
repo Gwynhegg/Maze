@@ -12,14 +12,12 @@ namespace Maze
 {
     public partial class Maze : Form
     {
-        bool isPath = false;
         int width, height, randomFactor=2, drawX;
         Random fact = new Random();
         Random numofPaths = new Random();
         Graphics g;
         Pen pen1 = new Pen(Color.Black, 2);
         Pen pen2 = new Pen(Color.Red, 1);
-        int X, Y;
         public Maze()
         {
             InitializeComponent();
