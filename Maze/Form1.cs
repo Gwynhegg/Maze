@@ -13,8 +13,9 @@ namespace Maze
     public partial class Maze : Form
     {
         bool isPath = false;
-        int width, height, randomFactor=3, drawX;
+        int width, height, randomFactor=2, drawX;
         Random fact = new Random();
+        Random numofPaths = new Random();
         Graphics g;
         Pen pen1 = new Pen(Color.Black, 2);
         Pen pen2 = new Pen(Color.Red, 1);
@@ -31,7 +32,7 @@ namespace Maze
             height = Int32.Parse(textHeight.Text);
             width = Int32.Parse(textWidth.Text);
             drawX = (panel1.Height-50) / height;
-            int exit = fact.Next(width*3/8,width*5/8);
+            int exit = 0;
             g.DrawLine(pen1, 10, 10, 10+exit * drawX, 10);
             g.DrawLine(pen1, 10 + exit * drawX+drawX, 10, 10 + width * drawX, 10);
             g.DrawLine(pen1, 10, 10, 10, 10+height*drawX);
@@ -50,38 +51,14 @@ namespace Maze
             createLastRow(mazeQuantity, mazeWalls);
             printMaze(mazeWalls);
         }
-
-        private void panel1_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (isPath)
-            {
-                g.DrawLine(pen2,X, Y, e.X, e.Y);
-                X = e.X;
-                Y = e.Y;
-            }
-        }
-
-        private void panel1_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (!isPath && e.Y>=height*drawX-drawX/2)
-            {
-                X = e.X;
-                Y = e.Y;
-                isPath = true;
-            } else
-            {
-                isPath = false;
-            }
-        }
-
         private void createLastRow(int[,] quant, byte[,] walls)
         {
-
             int numQuant = quant[height-1, 0];
             for (int i = height-1; i >0; i--)
             {
-                if (quant[height - 1, i] != quant[height - 1, i - 1]) walls[height - 1, i - 1] = 0;
+                if (quant[height - 1, i] != quant[height - 1, i - 1]) walls[height - 1, i - 1] = 2;
             }
+            walls[height - 1, width - 1] = 1;
         }
         private void createAnotherRow(int[,] quant, byte[,] walls,int numofRow)
         {
@@ -104,16 +81,18 @@ namespace Maze
                 {
                     if (fact.Next(randomFactor) == 1)
                     {
-                        walls[numofRow, i-1] = 1;
+                        walls[numofRow, i-1] = 3;
                         numQuant=quant[numofRow,i];
                     }
                     else
                     {
                         quant[numofRow, i] = numQuant;
+                        walls[numofRow, i - 1] = 2;
+                        if (i == width - 1 && walls[numofRow-1,i]!=2 && walls[numofRow-1,i]!=3) walls[numofRow, i] = 3;
                     }
                 } else
                 {
-                    walls[numofRow, i - 1] = 1;
+                    walls[numofRow, i - 1] = 3;
                 }
             }
         }
@@ -121,25 +100,32 @@ namespace Maze
         {
             int leftCorner = 0,rightCorner;
             int checkQuant = quant[numOfRow, leftCorner];
-            int noWall;
             for (int i = 0; i < width; i++)
             {
-                if (quant[numOfRow, i] != checkQuant || i == width - 1)
+                if (quant[numOfRow, i] != checkQuant || i==width-1)
                 {
-                        noWall = fact.Next(leftCorner, i);
-                        if (i == width - 1 && quant[numOfRow, i] == checkQuant) rightCorner = i + 1; else rightCorner = i;
-                        for (int j = leftCorner; j < rightCorner; j++)
+                    if (i == width - 1 && quant[numOfRow, i] == checkQuant) rightCorner = i+1; else
+                    {
+                        rightCorner = i;
+                        if (numOfRow == 0) walls[0, i] = 0;
+                    }
+                    int numofEntries = numofPaths.Next(1, rightCorner-leftCorner);
+                    while (numofEntries != 0)
+                    {
+                        int j = numofPaths.Next(leftCorner, rightCorner);
+                        if (walls[numOfRow, j] == 2)
                         {
-                            if (j != noWall)
-                            {
-                                if (walls[numOfRow, j] == 0) walls[numOfRow, j] = 2; else walls[numOfRow, j] = 3;
-                            } 
-                        }                    
+                            walls[numOfRow, j] = 0;
+                        } else if (walls[numOfRow, j] == 3)
+                        {
+                            walls[numOfRow, j] = 1;
+                        }
+                        numofEntries--;
+                    }                    
                     checkQuant = quant[numOfRow, i];
                     leftCorner = i;
                 
-                }
-                
+                }             
             }
             
         }    
@@ -151,11 +137,12 @@ namespace Maze
                 if (fact.Next(randomFactor)==1)
                 {
                     quant[0, j] = i;
-                    walls[0, j] = 1;
+                    walls[0, j] = 3;
                     i++;
                 } else
                 {
                     quant[0, j] = i;
+                    walls[0, j] = 2;
                 }
             }
         }

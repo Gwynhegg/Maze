@@ -62,22 +62,21 @@
             // 
             // panel1
             // 
-            this.panel1.Location = new System.Drawing.Point(13, 13);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(526, 425);
+            this.panel1.Size = new System.Drawing.Size(800, 450);
             this.panel1.TabIndex = 3;
-            this.panel1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseDown);
-            this.panel1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseMove);
             // 
             // Maze
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.panel1);
             this.Controls.Add(this.textWidth);
             this.Controls.Add(this.textHeight);
             this.Controls.Add(this.buttonCreate);
+            this.Controls.Add(this.panel1);
             this.Name = "Maze";
             this.Text = "Maze";
             this.ResumeLayout(false);
